@@ -16,6 +16,16 @@ pub const INT: &str = "INT";
 // Operators
 pub const ASSIGN: &str = "=";
 pub const PLUS: &str = "+";
+pub const MINUS: &str = "-";
+pub const BANG: &str = "!";
+pub const ASTERISK: &str = "*";
+pub const SLASH: &str = "/";
+
+pub const LT: &str = "<";
+pub const GT: &str = ">";
+
+pub const EQ: &str = "==";
+pub const NOT_EQ: &str = "!=";
 
 // Delimiters
 pub const COMMA: &str = ",";
@@ -29,10 +39,20 @@ pub const RBRACE: &str = "}";
 // Keywords
 pub const FUNCTION: &str = "FUNCTION";
 pub const LET: &str = "LET";
+pub const TRUE: &str = "TRUE";
+pub const FALSE: &str = "FALSE";
+pub const IF: &str = "IF";
+pub const ELSE: &str = "ELSE";
+pub const RETURN: &str = "RETURN";
 
 pub const KEYWORDS: phf::Map<&'static str, &'static str> = phf_map! {
     "fn" => FUNCTION,
     "let" => LET,
+    "true" => TRUE,
+    "false" => FALSE,
+    "if" => IF,
+    "else" => ELSE,
+    "return" => RETURN,
 };
 
 pub fn lookup_ident(ident: String) -> String {

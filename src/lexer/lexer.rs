@@ -30,6 +30,14 @@ impl Lexer {
 		self.read_position += 1;
 	}
 
+    fn peek_char(&self) -> char {
+        if self.read_position >= self.input.len() {
+            '\0'
+        } else {
+            self.input.chars().nth(self.read_position).unwrap()
+        }
+    }
+
 	pub fn new_token (&self, token_type: String, ch: char) -> token::Token {
 		token::Token {
 			r#type: token_type,
@@ -40,12 +48,42 @@ impl Lexer {
 	fn next_token(&mut self) -> token::Token {
         self.skip_whitespace();
 		let tok: token::Token = match self.ch {
-            '=' => self.new_token(token::ASSIGN.to_string(), self.ch),
+            '=' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    let literal = format!("{}{}", ch, self.ch);
+                    token::Token {
+                        r#type: token::EQ.to_string(),
+                        literal,
+                    }
+                } else {
+                    self.new_token(token::ASSIGN.to_string(), self.ch)
+                }
+            },
             ';' => self.new_token(token::SEMICOLON.to_string(), self.ch),
             '(' => self.new_token(token::LPAREN.to_string(), self.ch),
             ')' => self.new_token(token::RPAREN.to_string(), self.ch),
             ',' => self.new_token(token::COMMA.to_string(), self.ch),
             '+' => self.new_token(token::PLUS.to_string(), self.ch),
+            '-' => self.new_token(token::MINUS.to_string(), self.ch),
+            '!' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    let literal = format!("{}{}", ch, self.ch);
+                    token::Token {
+                        r#type: token::NOT_EQ.to_string(),
+                        literal,
+                    }
+                } else {
+                    self.new_token(token::BANG.to_string(), self.ch)
+                }
+            }
+            '*' => self.new_token(token::ASTERISK.to_string(), self.ch),
+            '/' => self.new_token(token::SLASH.to_string(), self.ch),
+            '<' => self.new_token(token::LT.to_string(), self.ch),
+            '>' => self.new_token(token::GT.to_string(), self.ch),
             '{' => self.new_token(token::LBRACE.to_string(), self.ch),
             '}' => self.new_token(token::RBRACE.to_string(), self.ch),
             '\0' => token::Token{
@@ -117,7 +155,17 @@ let ten = 10;
 let add = fn(x, y) {
 x + y;
 };
-let result = add(five, ten);");
+let result = add(five, ten);
+!-/*5;
+5 < 10 > 5;
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+10 == 10;
+10 != 9;
+");
 		let tests = vec![
             token::Token {
                 r#type: token::LET.to_string(),
@@ -258,6 +306,154 @@ let result = add(five, ten);");
             token::Token {
                 r#type: token::RPAREN.to_string(),
                 literal: ")".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::BANG.to_string(),
+                literal: "!".to_string(),
+            },
+            token::Token {
+                r#type: token::MINUS.to_string(),
+                literal: "-".to_string(),
+            },
+            token::Token {
+                r#type: token::SLASH.to_string(),
+                literal: "/".to_string(),
+            },
+            token::Token {
+                r#type: token::ASTERISK.to_string(),
+                literal: "*".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "5".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "5".to_string(),
+            },
+            token::Token {
+                r#type: token::LT.to_string(),
+                literal: "<".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "10".to_string(),
+            },
+            token::Token {
+                r#type: token::GT.to_string(),
+                literal: ">".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "5".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::IF.to_string(),
+                literal: "if".to_string(),
+            },
+            token::Token {
+                r#type: token::LPAREN.to_string(),
+                literal: "(".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "5".to_string(),
+            },
+            token::Token {
+                r#type: token::LT.to_string(),
+                literal: "<".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "10".to_string(),
+            },
+            token::Token {
+                r#type: token::RPAREN.to_string(),
+                literal: ")".to_string(),
+            },
+            token::Token {
+                r#type: token::LBRACE.to_string(),
+                literal: "{".to_string(),
+            },
+            token::Token {
+                r#type: token::RETURN.to_string(),
+                literal: "return".to_string(),
+            },
+            token::Token {
+                r#type: token::TRUE.to_string(),
+                literal: "true".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::RBRACE.to_string(),
+                literal: "}".to_string(),
+            },
+            token::Token {
+                r#type: token::ELSE.to_string(),
+                literal: "else".to_string(),
+            },
+            token::Token {
+                r#type: token::LBRACE.to_string(),
+                literal: "{".to_string(),
+            },
+            token::Token {
+                r#type: token::RETURN.to_string(),
+                literal: "return".to_string(),
+            },
+            token::Token {
+                r#type: token::FALSE.to_string(),
+                literal: "false".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::RBRACE.to_string(),
+                literal: "}".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "10".to_string(),
+            },
+            token::Token {
+                r#type: token::EQ.to_string(),
+                literal: "==".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "10".to_string(),
+            },
+            token::Token {
+                r#type: token::SEMICOLON.to_string(),
+                literal: ";".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "10".to_string(),
+            }, 
+            token::Token {
+                r#type: token::NOT_EQ.to_string(),
+                literal: "!=".to_string(),
+            },
+            token::Token {
+                r#type: token::INT.to_string(),
+                literal: "9".to_string(),
             },
             token::Token {
                 r#type: token::SEMICOLON.to_string(),
