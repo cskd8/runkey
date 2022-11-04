@@ -1,3 +1,5 @@
+use phf::phf_map;
+
 #[derive(Debug, Clone)]
 pub struct Token {
     pub r#type: String,
@@ -27,3 +29,15 @@ pub const RBRACE: &str = "}";
 // Keywords
 pub const FUNCTION: &str = "FUNCTION";
 pub const LET: &str = "LET";
+
+pub const KEYWORDS: phf::Map<&'static str, &'static str> = phf_map! {
+    "fn" => FUNCTION,
+    "let" => LET,
+};
+
+pub fn lookup_ident(ident: String) -> String {
+    match KEYWORDS.get(&ident.as_str()) {
+        Some(keyword) => keyword.to_string(),
+        None => IDENT.to_string(),
+    }
+}
