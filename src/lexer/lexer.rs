@@ -8,18 +8,18 @@ pub struct Lexer {
 	pub ch: char,
 }
 
-pub fn new(input: String) -> Lexer {
-	let mut l = Lexer {
-		input,
-		position: 0,
-		read_position: 0,
-		ch: '\0',
-	};
-	l.read_char();
-	l
-}
-
 impl Lexer {
+    pub fn new(input: String) -> Lexer {
+        let mut l = Lexer {
+            input,
+            position: 0,
+            read_position: 0,
+            ch: '\0',
+        };
+        l.read_char();
+        l
+    }
+
 	fn read_char(&mut self) {
 		if self.read_position >= self.input.len() {
 			self.ch = '\0';
@@ -38,7 +38,7 @@ impl Lexer {
         }
     }
 
-	fn new_token (&self, token_type: String, ch: char) -> token::Token {
+	pub fn new_token (&self, token_type: String, ch: char) -> token::Token {
 		token::Token {
 			r#type: token_type,
 			literal: ch.to_string(),
@@ -464,7 +464,7 @@ if (5 < 10) {
                 literal: "".to_string(),
             },
         ];
-		let mut l = lexer::new(input);
+		let mut l = lexer::Lexer::new(input);
 		for tt in tests {
 			let tok = l.next_token();
 			assert_eq!(tok.r#type, tt.r#type);

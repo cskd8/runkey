@@ -10,7 +10,7 @@ pub fn start(r#in: io::Stdin, mut out: io::Stdout) -> io::Result<()> {
         out.write(PROMPT.as_bytes())?;
         out.flush()?;
         r#in.read_line(&mut input)?;
-        let mut l = lexer::new(input.clone());
+        let mut l = lexer::Lexer::new(input.clone());
         loop {
             let tok = l.next_token();
             println!("{:?}", tok);
